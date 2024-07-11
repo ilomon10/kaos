@@ -1,44 +1,59 @@
-import NextLogo from "./NextLogo";
-import SupabaseLogo from "./SupabaseLogo";
+"use client";
 
-export default function Header() {
+import { ActionIcon, Title } from "@mantine/core";
+import {
+  BellIcon,
+  ChevronLeftIcon,
+  MailIcon,
+  MenuIcon,
+  ShoppingCartIcon,
+} from "lucide-react";
+import Link from "next/link";
+import React from "react";
+import { useRouter } from "next/navigation";
+import { cx } from "class-variance-authority";
+
+type HeaderProps = {
+  isSticky?: boolean;
+  withBorder?: boolean;
+  leftSection?: React.ReactNode;
+  centerSection?: React.ReactNode;
+  rightSection?: React.ReactNode;
+};
+
+export const Header: React.FC<HeaderProps> = ({
+  isSticky = false,
+  withBorder = true,
+  leftSection,
+  centerSection,
+  rightSection,
+}) => {
+  const router = useRouter();
   return (
-    <div className="flex flex-col gap-16 items-center">
-      <div className="flex gap-8 justify-center items-center">
-        <a
-          href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <SupabaseLogo />
-        </a>
-        <span className="border-l rotate-45 h-6" />
-        <a href="https://nextjs.org/" target="_blank" rel="noreferrer">
-          <NextLogo />
-        </a>
+    <div
+      className={cx(
+        "min-h-12 flex flex-nowrap items-center px-2 py-2",
+        withBorder && "border-b border-gray-200",
+        isSticky && "sticky top-0 bg-white"
+      )}
+    >
+      <div className="flex">
+        {leftSection ? (
+          leftSection
+        ) : (
+          <ActionIcon
+            variant="subtle"
+            color="black"
+            onClick={() => {
+              router.back();
+            }}
+          >
+            <ChevronLeftIcon size={22} />
+          </ActionIcon>
+        )}
       </div>
-      <h1 className="sr-only">Supabase and Next.js Starter Template</h1>
-      <p className="text-3xl lg:text-4xl !leading-tight mx-auto max-w-xl text-center">
-        The fastest way to build apps with{" "}
-        <a
-          href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-          target="_blank"
-          className="font-bold hover:underline"
-          rel="noreferrer"
-        >
-          Supabase
-        </a>{" "}
-        and{" "}
-        <a
-          href="https://nextjs.org/"
-          target="_blank"
-          className="font-bold hover:underline"
-          rel="noreferrer"
-        >
-          Next.js
-        </a>
-      </p>
-      <div className="w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8" />
+      <div className="flex-grow flex-shrink px-2">{centerSection}</div>
+      <div className="flex flex-shrink-0 gap-3">{rightSection}</div>
     </div>
   );
-}
+};
