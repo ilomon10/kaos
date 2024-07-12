@@ -24,7 +24,7 @@ interface CanvasProviderContextValue {
       title: string;
       rectOptions: Partial<fabric.Rect>;
     }>
-  ) => void;
+  ) => Artboard | undefined;
 }
 
 const CanvasProviderContext = React.createContext<CanvasProviderContextValue>(
@@ -59,13 +59,13 @@ export const CanvasProvider: React.FC<React.PropsWithChildren> = ({
           blur: 2,
         }),
         strokeWidth: 1,
-        selectable: false,
+        // selectable: false,
       });
+
+      console.log(artboardRect.controls);
 
       // Create the title text
       const artboardTitle = new fabric.FabricText((title = `Artboard ${id}`), {
-        left: rectOptions?.left || 0,
-        top: (rectOptions?.top || 0) - 30, // Place the title above the rectangle
         fontSize: 20,
         fontFamily: "Arial",
         fill: "black",
@@ -74,6 +74,28 @@ export const CanvasProvider: React.FC<React.PropsWithChildren> = ({
         originX: "center",
         originY: "bottom",
         textAlign: "center",
+      });
+
+      artboardRect.controls.moveControl = new fabric.Control({
+        x: 0.5,
+        y: -0.5,
+        offsetX: -16,
+        offsetY: 16,
+        cursorStyle: "pointer",
+        // visible: true,
+        positionHandler: (dim) => {
+          console.log(dim);
+          return dim;
+        },
+        render: (ctx, left, top, _styleOverride, fabricObject) => {
+          console.log("Context", fabricObject);
+          console.log("left top", left, top);
+          ctx.save();
+          ctx.translate(100, top);
+          ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
+          artboardTitle._render(ctx);
+          ctx.restore();
+        },
       });
 
       const artboard = new fabric.Group(
@@ -87,7 +109,8 @@ export const CanvasProvider: React.FC<React.PropsWithChildren> = ({
         }
       ) as Artboard;
 
-      canvas.add(artboard);
+      // canvas.add(artboard);
+      canvas.add(artboardRect);
       setArtboards((prevArtboards) => [...prevArtboards, artboard]);
       setLayers((prevLayers) => [...prevLayers, { id, object: artboard }]);
 
@@ -102,6 +125,8 @@ export const CanvasProvider: React.FC<React.PropsWithChildren> = ({
       });
 
       canvas.requestRenderAll();
+
+      return artboard;
     }
   };
 

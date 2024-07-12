@@ -1,18 +1,32 @@
 import { createClient } from "@/utils/supabase/server";
 import {
+  ActionIcon,
+  AspectRatio,
+  Avatar,
+  BackgroundImage,
   Card,
   CardSection,
+  Divider,
   Flex,
   Group,
   Image,
   Rating,
+  ScrollArea,
   Text,
   Title,
 } from "@mantine/core";
-import { DotIcon, StarIcon } from "lucide-react";
+import {
+  DotIcon,
+  FlameIcon,
+  ShirtIcon,
+  StarIcon,
+  ThumbsUpIcon,
+  TrendingUpIcon,
+} from "lucide-react";
 import Link from "next/link";
 import slugify from "slugify";
 import Header from "./Header";
+import headerSectionBackground from "./designsHeaderSectionBackground.png";
 
 export default async function Index() {
   const canInitSupabaseClient = () => {
@@ -30,7 +44,7 @@ export default async function Index() {
 
   const items = [
     {
-      thumbnail: "https://placehold.co/600x400",
+      thumbnail: "https://placehold.co/600x400?text=Product+Photo",
       title: "PUMA Sepatu Lari Transport Modern Fresh",
       price: 999000,
       discount: 25,
@@ -38,7 +52,7 @@ export default async function Index() {
       copy: 12,
     },
     {
-      thumbnail: "https://placehold.co/600x400",
+      thumbnail: "https://placehold.co/600x400?text=Product+Photo",
       title: "PUMA Sepatu Lari Transport Modern Fresh",
       price: 999000,
       discount: 25,
@@ -46,7 +60,7 @@ export default async function Index() {
       copy: 12,
     },
     {
-      thumbnail: "https://placehold.co/600x400",
+      thumbnail: "https://placehold.co/600x400?text=Product+Photo",
       title: "PUMA Sepatu Lari Transport Modern Fresh",
       price: 999000,
       discount: 25,
@@ -54,7 +68,7 @@ export default async function Index() {
       copy: 12,
     },
     {
-      thumbnail: "https://placehold.co/600x400",
+      thumbnail: "https://placehold.co/600x400?text=Product+Photo",
       title: "PUMA Sepatu Lari Transport Modern Fresh",
       price: 999000,
       discount: 25,
@@ -63,11 +77,185 @@ export default async function Index() {
     },
   ];
 
+  const templates = [
+    {
+      label: "All",
+      thumbnail: "https://unsplash.it/425/620?random",
+    },
+    {
+      label: "Posters",
+      thumbnail: "https://unsplash.it/425/620?shirt",
+    },
+    {
+      label: "T-Shirt",
+      thumbnail: "https://unsplash.it/425/620?image=1",
+    },
+    {
+      label: "Hoodie",
+      thumbnail: "https://unsplash.it/425/620",
+    },
+    {
+      label: "Logos",
+      thumbnail: "https://unsplash.it/425/620",
+    },
+    {
+      label: "Bags",
+      thumbnail: "https://unsplash.it/425/620",
+    },
+    {
+      label: "Hats",
+      thumbnail: "https://unsplash.it/425/620",
+    },
+  ];
+
   return (
     <div className="flex flex-col">
       <Header />
 
       <main>
+        <section className="p-2 bg-gray-100">
+          <Card radius={"lg"}>
+            <CardSection>
+              <BackgroundImage src={headerSectionBackground.src}>
+                <Flex
+                  h={"100%"}
+                  direction={"column"}
+                  justify={"center"}
+                  py={"xl"}
+                >
+                  <Text
+                    c={"white"}
+                    ff={"monospace"}
+                    fz={"h3"}
+                    fw={800}
+                    ta={"center"}
+                    px={22}
+                    mb={"lg"}
+                  >
+                    Pilih jo yang cocok di mata kong pesan. OK?!
+                  </Text>
+                  <div className="px-6">
+                    <Group justify="space-evenly">
+                      <ActionIcon
+                        variant="white"
+                        size={48}
+                        color={"black"}
+                        radius={"xl"}
+                      >
+                        <FlameIcon />
+                      </ActionIcon>
+                      <ActionIcon
+                        variant="outline"
+                        size={48}
+                        color={"white"}
+                        radius={"xl"}
+                      >
+                        <ShirtIcon />
+                      </ActionIcon>
+                      <ActionIcon
+                        variant="outline"
+                        size={48}
+                        color={"white"}
+                        radius={"xl"}
+                      >
+                        <ThumbsUpIcon />
+                      </ActionIcon>
+                    </Group>
+                  </div>
+                </Flex>
+              </BackgroundImage>
+            </CardSection>
+          </Card>
+        </section>
+        <section className="bg-gray-100">
+          <ScrollArea>
+            <Group wrap={"nowrap"} px={"sm"} mt="sm" mb={"lg"}>
+              {templates.map(({ label, thumbnail }, index) => (
+                <Card
+                  key={label}
+                  w={120}
+                  shadow={index > 0 ? "" : "md"}
+                  bg={index > 0 ? "transparent" : "white"}
+                >
+                  <AspectRatio>
+                    <Image
+                      src={`https://unsplash.it/425/620?image=${index + 20}`}
+                      radius="md"
+                    />
+                  </AspectRatio>
+                  <Text size="sm" ta={"center"} mt={"sm"} c={"gray.6"}>
+                    {label}
+                  </Text>
+                </Card>
+              ))}
+            </Group>
+          </ScrollArea>
+        </section>
+        <section className="px-2 pt-4">
+          <Flex
+            justify="flex-start"
+            align="flex-start"
+            direction="row"
+            wrap="nowrap"
+            className="-mx-2"
+          >
+            <div className="w-1/2 px-2">
+              {items.map((item, index) => (
+                <Card
+                  key={index}
+                  component={Link}
+                  href={`/design/${slugify(item.title, { lower: true })}/edit`}
+                  mb={"lg"}
+                >
+                  <CardSection>
+                    <AspectRatio ratio={6 / (7 - 0.95 * Math.random())}>
+                      <Image
+                        radius={"md"}
+                        src={`https://unsplash.it/425/620?image=${index + 10}`}
+                      />
+                    </AspectRatio>
+                  </CardSection>
+                  <CardSection mt={8}>
+                    <Group gap="xs">
+                      <Avatar />
+                      <Text fw={"bold"} fz={"sm"}>
+                        Marcelo Unruh
+                      </Text>
+                    </Group>
+                  </CardSection>
+                </Card>
+              ))}
+            </div>
+            <div className="w-1/2 px-2">
+              {items.map((item, index) => (
+                <Card
+                  key={index}
+                  component={Link}
+                  href={`/design/${slugify(item.title, { lower: true })}/edit`}
+                  mb={"lg"}
+                >
+                  <CardSection>
+                    <AspectRatio ratio={6 / (7 - 0.95 * Math.random())}>
+                      <Image
+                        radius={"md"}
+                        src={`https://unsplash.it/425/620?image=${index}`}
+                      />
+                    </AspectRatio>
+                  </CardSection>
+                  <CardSection mt={8}>
+                    <Group gap="xs">
+                      <Avatar />
+                      <Text fw={"bold"} fz={"sm"}>
+                        Marcelo Unruh
+                      </Text>
+                    </Group>
+                  </CardSection>
+                </Card>
+              ))}
+            </div>
+          </Flex>
+        </section>
+        <Divider size={18} my={"lg"} />
         <section className="px-2">
           <Title order={2} mt={"sm"} mb={"xs"}>
             For You
@@ -87,7 +275,11 @@ export default async function Index() {
                   mb={"lg"}
                 >
                   <CardSection>
-                    <Image src={item.thumbnail} />
+                    <AspectRatio>
+                      <Image
+                        src={`https://unsplash.it/425/620?image=${index}`}
+                      />
+                    </AspectRatio>
                   </CardSection>
                   <CardSection mt={12}>
                     <Text size="sm">{item.title}</Text>
@@ -127,7 +319,11 @@ export default async function Index() {
                   mb={"lg"}
                 >
                   <CardSection>
-                    <Image src={item.thumbnail} />
+                    <AspectRatio>
+                      <Image
+                        src={`https://unsplash.it/425/620?image=${index + 10}`}
+                      />
+                    </AspectRatio>
                   </CardSection>
                   <CardSection mt={12}>
                     <Text size="sm">{item.title}</Text>

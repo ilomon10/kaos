@@ -34,7 +34,7 @@ export const Header: React.FC<HeaderProps> = ({
       className={cx(
         "min-h-12 flex flex-nowrap items-center px-2 py-2",
         withBorder && "border-b border-gray-200",
-        isSticky && "sticky top-0 bg-white"
+        isSticky && "sticky top-0 bg-white z-10"
       )}
     >
       <div className="flex">

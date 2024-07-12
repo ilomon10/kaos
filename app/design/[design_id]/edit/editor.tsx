@@ -8,6 +8,7 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useCanvasContext } from "@/components/react-fabric/Provider";
 import { generateID } from "@/utils/common/generateID";
+import { FabricObject } from "fabric";
 
 export const Editor = () => {
   const { canvas, addArtboard } = useCanvasContext();
@@ -20,7 +21,7 @@ export const Editor = () => {
       width: canvas.width * 0.7,
     };
 
-    addArtboard(generateID(), {
+    const artboard = addArtboard(generateID(), {
       title: "Main",
       rectOptions: {
         backgroundColor: "white",
@@ -29,7 +30,8 @@ export const Editor = () => {
         width: artboardSize.width,
         height: artboardSize.height,
       },
-    });
+    }) as FabricObject;
+    // canvas.setActiveObject(artboard);
   }, [canvas]);
 
   return (

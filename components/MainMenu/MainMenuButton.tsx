@@ -8,7 +8,7 @@ import { Header } from "../Header";
 import { MainMenuPage } from "./MainMenuPage";
 
 export const MainMenuButton = () => {
-  const [opened, { toggle }] = useDisclosure(true);
+  const [opened, { toggle }] = useDisclosure(false);
   return (
     <>
       <ActionIcon variant="subtle" color="black" onClick={toggle}>
