@@ -14,12 +14,13 @@ export const Toolbar = () => {
   const router = useRouter();
   return (
     <Flex
-      className="fixed top-0 left-0 right-0 z-10 px-3 py-4"
+      className="fixed top-0 left-0 right-0 z-10 px-3 py-4 pointer-events-none"
       justify={"space-between"}
     >
       <div>
         <ActionIcon
           variant="subtle"
+          className="pointer-events-auto"
           onClick={() => {
             router.back();
           }}
@@ -28,7 +29,7 @@ export const Toolbar = () => {
         </ActionIcon>
       </div>
       <Group>
-        <ActionIcon variant="subtle">
+        <ActionIcon variant="subtle" className="pointer-events-auto">
           <DownloadIcon />
         </ActionIcon>
       </Group>

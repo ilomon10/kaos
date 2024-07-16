@@ -1,135 +1,116 @@
-import ArtboardComponent from "@/components/react-konva/ArtboardComponent";
-import {
-  KonvaProvider,
-  useKonvaContext,
-} from "@/components/react-konva/KonvaContext";
-import LayerComponent from "@/components/react-konva/LayerComponent";
+"use client";
+
+import { useElementOperations } from "@/components/react-konva/hooks";
+import { Viewport } from "@/components/react-konva/KonvaStructure";
+import { Artboard, KonvaObject, Layer } from "@/components/react-konva/types";
 import { generateID } from "@/utils/common/generateID";
-import Konva from "konva";
+import { View } from "lucide-react";
 import React from "react";
-import { Layer, Stage, Text, Transformer } from "react-konva";
 
 interface ViewportProps {
   width?: number;
   height?: number;
 }
 
-export const Viewport: React.FC<ViewportProps> = ({ width, height }) => {
-  const trRef = React.useRef<Konva.Transformer>();
-  const stageRef = React.useRef<Konva.Stage>();
-
-  const {
-    structure,
-    selectedObjects,
-    selectObject,
-    deselectObject,
-    addObject,
-    addArtboard,
-    attachNode,
-    clearSelectionObject,
-    updateObject,
-  } = useKonvaContext();
-
+export const Canvas: React.FC<ViewportProps> = ({
+  width = 100,
+  height = 100,
+}) => {
   const onceRef = React.useRef(0);
+  const {
+    addArtboard,
+    addLayer,
+    addChildToArtboard,
+    addObject,
+    addChildToLayer,
+  } = useElementOperations();
 
   React.useEffect(() => {
     console.log("ONCE");
     if (onceRef.current > 0) return;
 
-    const artboard = addArtboard({
-      id: generateID(),
-      name: "Coba",
+    const newArtboard: Artboard = {
+      id: `artboard-${generateID()}`,
+      name: "New Artboard",
       x: 100,
       y: 100,
       width: 100,
       height: 100,
-      objects: [],
-    });
+      children: [],
+    };
+    addArtboard(newArtboard);
 
-    addObject<Konva.CircleConfig>(
-      {
-        id: generateID(),
-        type: "circle",
-        config: {
-          fill: "red",
-          stroke: "black",
-          width: 100,
-          height: 50,
-          x: 16,
-          y: 40,
-        },
-        data: {},
-      },
-      artboard.id
-    );
+    const newLayer: Layer = {
+      id: `layer-${generateID()}`,
+      name: "New Layer",
+      children: [],
+    };
+    addLayer(newLayer);
 
-    addObject<Konva.CircleConfig>(
-      {
-        id: generateID(),
-        type: "circle",
-        config: {
-          fill: "blue",
-          stroke: "black",
-          width: 100,
-          height: 50,
-          x: 63,
-          y: 58,
-        },
-        data: {},
+    addChildToArtboard(newArtboard.id, newLayer.id);
+
+    const newObject: KonvaObject<"rect"> = {
+      id: `rect-${generateID()}`,
+      type: "rect",
+      config: {
+        x: 10,
+        y: 0,
+        width: 50,
+        height: 50,
+        fill: "red",
       },
-      artboard.id
-    );
+      data: {},
+    };
+
+    addObject(newObject);
+    addChildToLayer(newLayer.id, newObject.id);
+
+    // const artboard = addArtboard({
+    //   id: generateID(),
+    //   name: "Coba",
+    //   x: 100,
+    //   y: 100,
+    //   width: 100,
+    //   height: 100,
+    //   objects: [],
+    // });
+
+    // addObject<Konva.CircleConfig>(
+    //   {
+    //     id: generateID(),
+    //     type: "circle",
+    //     config: {
+    //       fill: "red",
+    //       stroke: "black",
+    //       width: 100,
+    //       height: 50,
+    //       x: 16,
+    //       y: 40,
+    //     },
+    //     data: {},
+    //   },
+    //   artboard.id
+    // );
+
+    // addObject<Konva.CircleConfig>(
+    //   {
+    //     id: generateID(),
+    //     type: "circle",
+    //     config: {
+    //       fill: "blue",
+    //       stroke: "black",
+    //       width: 100,
+    //       height: 50,
+    //       x: 63,
+    //       y: 58,
+    //     },
+    //     data: {},
+    //   },
+    //   artboard.id
+    // );
 
     onceRef.current += 1;
   }, []);
 
-  React.useEffect(() => {
-    console.log(selectedObjects, trRef);
-    if (!trRef.current) return;
-    if (selectedObjects.size > 0) {
-      // we need to attach transformer manually
-      const objects = Array.from(selectedObjects.values());
-      trRef.current.setNodes(objects);
-      // trRef.current.nodes(objects);
-      trRef.current.getLayer()?.batchDraw();
-    }
-  }, [selectedObjects]);
-
-  return (
-    <Stage
-      style={{
-        backgroundColor: "#eee",
-      }}
-      ref={(ref) => (stageRef.current = ref as any)}
-      width={width}
-      height={height}
-      onClick={(e) => {
-        if (e.target === e.target.getStage()) {
-          clearSelectionObject();
-        } else {
-          clearSelectionObject();
-          selectObject(e.target);
-        }
-      }}
-    >
-      {structure.artboards.map((layer) => (
-        <ArtboardComponent key={layer.id} artboard={layer}>
-          {selectedObjects.size > 0 && (
-            <Transformer
-              ref={(ref) => (trRef.current = ref as any)}
-              flipEnabled={false}
-              ignoreStroke={true}
-              boundBoxFunc={(oldBox, newBox) => {
-                // limit resize
-                if (Math.abs(newBox.width) < 5 || Math.abs(newBox.height) < 5) {
-                  return oldBox;
-                }
-                return newBox;
-              }}
-            />
-          )}
-        </ArtboardComponent>
-      ))}
-    </Stage>
-  );
+  return <Viewport width={width} height={height} />;
 };

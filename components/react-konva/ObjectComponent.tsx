@@ -1,88 +1,41 @@
 import React from "react";
-import {
-  Rect,
-  Circle,
-  Image,
-  Text,
-  Group as KonvaGroup,
-  KonvaNodeEvents,
-} from "react-konva";
-import { KonvaObject, Group } from "./types"; // Assume types are in a separate file
+import { KonvaObject } from "./types"; // Assume types are in a separate file
+import { Circle, Image, Rect, Text } from "react-konva";
 import Konva from "konva";
 
-interface ObjectProps extends KonvaNodeEvents {
-  obj: KonvaObject | Group;
-  draggable: boolean;
+interface ObjectComponentProps {
+  object: KonvaObject<any>;
 }
 
-const ObjectComponent = React.forwardRef<any, ObjectProps>(
-  ({ obj, draggable, ...events }, ref) => {
-    if ("objects" in obj) {
-      const { transform, objects } = obj as Group;
-      return (
-        <KonvaGroup {...transform}>
-          {objects.map((item) => (
-            <ObjectComponent
-              ref={ref}
-              key={item.id}
-              obj={item}
-              draggable={draggable}
-              {...events}
-            />
-          ))}
-        </KonvaGroup>
-      );
-    }
-
-    const { id, type, config, transform } =
-      obj as KonvaObject<Konva.ImageConfig>;
-    const transformedConfig = { ...config, ...transform };
-
-    switch (type) {
+const ObjectComponent = React.forwardRef<any, ObjectComponentProps>(
+  ({ object }, ref) => {
+    switch (object.type) {
       case "rect":
         return (
-          <Rect
-            id={id}
-            ref={ref}
-            draggable={draggable}
-            strokeScaleEnabled={false}
-            {...transformedConfig}
-            {...events}
-          />
+          <Rect id={object.id} ref={ref} {...object.config} draggable={true} />
         );
       case "circle":
         return (
           <Circle
-            id={id}
+            id={object.id}
             ref={ref}
-            draggable={draggable}
-            strokeScaleEnabled={false}
-            {...transformedConfig}
-            {...events}
+            {...object.config}
+            draggable={true}
           />
         );
       case "image":
         return (
           <Image
-            id={id}
+            id={object.id}
             ref={ref}
-            draggable={draggable}
-            {...transformedConfig}
-            {...events}
+            {...(object.config as Konva.ImageConfig)}
+            draggable={true}
           />
         );
       case "text":
         return (
-          <Text
-            id={id}
-            ref={ref}
-            draggable={draggable}
-            {...transformedConfig}
-            {...events}
-          />
+          <Text id={object.id} ref={ref} {...object.config} draggable={true} />
         );
-      default:
-        return null;
     }
   }
 );

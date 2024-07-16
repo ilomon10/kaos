@@ -6,7 +6,7 @@ import { Button, Flex } from "@mantine/core";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useResizeObserver } from "@mantine/hooks";
-import { Viewport } from "./Viewport";
+import { Canvas } from "./Viewport";
 
 export const Editor = () => {
   const [containerRef, { height, width }] = useResizeObserver();
@@ -19,7 +19,7 @@ export const Editor = () => {
       }}
     >
       <Toolbar />
-      <Viewport height={height} width={width} />
+      <Canvas height={height} width={width} />
       <Flex
         className="fixed bottom-0 left-0 right-0 px-3 py-4 pointer-events-none"
         justify={"space-between"}
