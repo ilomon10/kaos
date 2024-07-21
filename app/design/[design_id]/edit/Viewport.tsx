@@ -8,7 +8,6 @@ import {
   Layer,
 } from "@/components/react-konva/element/types";
 import { generateID } from "@/utils/common/generateID";
-import { View } from "lucide-react";
 import React from "react";
 
 interface ViewportProps {

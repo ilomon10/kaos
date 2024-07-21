@@ -1,154 +1,129 @@
 import Konva from "konva";
 import React, { useContext } from "react";
-import { Artboard, Group, KonvaObject, Layer } from "../types";
-import { Transformer } from "react-konva";
+import {
+  Artboard,
+  Group,
+  Shape,
+  Layer,
+  ElementType,
+  FlatState,
+} from "../element/types";
+import { Text, Transformer } from "react-konva";
 import { generateID } from "@/utils/common/generateID";
+import { Stage } from "konva/lib/Stage";
+import { KonvaEventObject } from "konva/lib/Node";
+import { useKonvaContext } from "../hooks";
 
-type TransformNode = {
-  id: string;
-  element: Artboard | Layer | Group | KonvaObject<any>;
-  object: Konva.Node;
+type SelectedElement = {
+  type: ElementType;
+  element: Artboard | Group | Shape<any> | Layer;
+  ref: Konva.Node;
 };
-
-type TransfromContextValue = {
-  nodes: { [id: string]: TransformNode };
-  transformerConfig: Konva.TransformerConfig;
-  transformerId: string;
-};
-
-type Action =
-  | {
-      type: "SET_TRANSFORM_CONFIG";
-      config: Partial<TransfromContextValue["transformerConfig"]>;
-    }
-  | {
-      type: "ADD_ELEMENT";
-      node: TransformNode;
-    }
-  | { type: "REMOVE_ELEMENT"; id: string }
-  | { type: "SET_ELEMENTS"; nodes: TransformNode[] }
-  | { type: "SET_REF"; ref: Konva.Transformer };
 
 const initialValue = {
-  nodes: {},
-  transformerConfig: {},
-  transformerId: `tr-${generateID()}`,
+  _trId: `transformer-${generateID()}`,
+  elements: [],
 };
 
-const TransformContext =
-  React.createContext<TransfromContextValue>(initialValue);
-const TransformDispatchContext = React.createContext<React.Dispatch<Action>>(
-  () => null
-);
+const TransformContext = React.createContext<{
+  _trId: string;
+  elements: SelectedElement[];
+}>(initialValue);
 
 export const TransformContextProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
-  const [value, dispatch] = React.useReducer(reducer, initialValue);
+  const konvaContext = useKonvaContext();
 
   const transformerRef = React.useRef<Konva.Transformer | null>(null as any);
+  const isDragging = React.useRef<boolean>(false);
+
+  const elements = React.useMemo(() => {
+    const stage = transformerRef.current?.getStage();
+    const result: SelectedElement[] = [];
+
+    if (!stage) return result;
+
+    Object.keys(konvaContext.selected).forEach((type: any) => {
+      konvaContext.selected[type as ElementType].forEach((id) => {
+        let ref = stage.findOne(`#${id}`);
+        if (type === "artboard") {
+          ref = (ref as Konva.Group).findOne(".artboard-board");
+        }
+        if (!ref) return;
+        result.push({
+          type: type,
+          element: konvaContext.elements[`${type}s` as keyof FlatState][id],
+          ref: ref,
+        });
+      });
+    });
+
+    return result;
+  }, [konvaContext.selected]);
 
   const isSelected = React.useMemo(() => {
-    return Object.keys(value.nodes).length > 0;
-  }, [value.nodes]);
+    return elements.length > 0;
+  }, [elements]);
 
   React.useEffect(() => {
     if (isSelected) {
-      transformerRef.current?.setNodes(
-        Object.values(value.nodes).map(({ object }) => object)
-      );
+      transformerRef.current?.setNodes(elements.map(({ ref }) => ref));
     } else {
       transformerRef.current?.setNodes([]);
     }
     transformerRef.current?.getLayer()?.batchDraw();
-  }, [isSelected, value.nodes]);
+  }, [isSelected, elements]);
+
+  React.useEffect(() => {
+    const stage = transformerRef.current?.getStage();
+
+    if (!stage) return;
+
+    const handleOutclick = (evt: KonvaEventObject<Stage>) => {
+      if (isDragging.current) {
+        isDragging.current = false;
+        return;
+      }
+      if (evt.target !== stage) return;
+
+      konvaContext.helper.clearSelection();
+    };
+
+    stage.on("pointerclick", handleOutclick);
+
+    return () => {
+      stage.off("pointerclick", handleOutclick);
+    };
+  }, [transformerRef.current]);
+
+  const handleDragStart = () => {
+    isDragging.current = true;
+  };
+  const handleDragEnd = () => {
+    isDragging.current = false;
+  };
 
   return (
-    <TransformContext.Provider value={value}>
-      <TransformDispatchContext.Provider value={dispatch}>
-        {children}
-        <Transformer
-          id={value.transformerId}
-          ref={transformerRef}
-          ignoreStroke={true}
-          {...value.transformerConfig}
-          // rotateEnabled={false}
-        />
-      </TransformDispatchContext.Provider>
+    <TransformContext.Provider
+      value={{
+        ...initialValue,
+        elements,
+      }}
+    >
+      {children}
+      <Transformer
+        id={initialValue._trId}
+        ref={transformerRef}
+        ignoreStroke={true}
+        onDragEnd={handleDragEnd}
+        onDragStart={handleDragStart}
+        enabledAnchors={[]}
+        rotateEnabled={false}
+      />
+      {elements.map(({ element }) => {
+        return <Text key={element.id} text={element.id} x={0} y={0} />;
+      })}
     </TransformContext.Provider>
   );
-};
-
-function reducer(
-  state: TransfromContextValue,
-  action: Action
-): TransfromContextValue {
-  switch (action.type) {
-    case "ADD_ELEMENT":
-      return {
-        ...state,
-        nodes: {
-          ...state.nodes,
-          [action.node.id]: action.node,
-        },
-      };
-    case "REMOVE_ELEMENT":
-      const { [action.id]: removed, ...remaining } = state.nodes;
-      return {
-        ...state,
-        nodes: remaining,
-      };
-    case "SET_ELEMENTS":
-      return {
-        ...state,
-        nodes: action.nodes.reduce((p, node) => {
-          return {
-            ...p,
-            [node.id]: node,
-          };
-        }, {} as TransfromContextValue["nodes"]),
-      };
-    case "SET_TRANSFORM_CONFIG":
-      return {
-        ...state,
-        transformerConfig: action.config,
-      };
-    default:
-      return state;
-  }
-}
-
-export const useTransformContextState = () =>
-  React.useContext(TransformContext);
-export const useTransformContextDispatch = () =>
-  React.useContext(TransformDispatchContext);
-
-export const useTransformContext = () => {
-  const { nodes, transformerId } = useTransformContextState();
-  const dispatch = useTransformContextDispatch();
-
-  const addElement = (node: TransformNode) => {
-    dispatch({ type: "ADD_ELEMENT", node });
-  };
-  const removeElement = (id: string) => {
-    dispatch({ type: "REMOVE_ELEMENT", id });
-  };
-  const setElements = (nodes: TransformNode[]) => {
-    dispatch({ type: "SET_ELEMENTS", nodes });
-  };
-
-  const setConfig = (nodes: TransformNode[]) => {
-    dispatch({ type: "SET_ELEMENTS", nodes });
-  };
-
-  return {
-    nodes,
-    transformerId,
-
-    addElement,
-    removeElement,
-    setElements,
-
-    setConfig,
-  };
 };

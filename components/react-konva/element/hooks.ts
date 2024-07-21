@@ -1,17 +1,17 @@
 "use client";
 
-import { useKonvaContextDispatch } from "./state";
+import { useElementContextDispatch } from "./state";
 import {
   ElementType,
   ElementTypeMap,
   Artboard,
   Layer,
   Group,
-  KonvaObject,
+  Shape,
 } from "./types";
 
 export function useElementOperations() {
-  const dispatch = useKonvaContextDispatch();
+  const dispatch = useElementContextDispatch();
 
   const addElement = <T extends ElementType>(
     elementType: T,
@@ -80,9 +80,9 @@ export function useElementOperations() {
     updateGroup: (id: string, updates: Partial<Group>) =>
       updateElement("group", id, updates),
 
-    addObject: (object: KonvaObject<any>) => addElement("object", object),
+    addObject: (object: Shape<any>) => addElement("object", object),
     removeObject: (id: string) => removeElement("object", id),
-    updateObject: (id: string, updates: Partial<KonvaObject<any>>) =>
+    updateObject: (id: string, updates: Partial<Shape<any>>) =>
       updateElement("object", id, updates),
 
     addChildToArtboard: (artboardId: string, childId: string) =>

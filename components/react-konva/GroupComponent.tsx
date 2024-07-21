@@ -1,14 +1,14 @@
 import LayerComponent from "./LayerComponent";
 import ObjectComponent from "./ObjectComponent";
-import { useKonvaContextState } from "./state";
-import { Group } from "./types";
+import { useElementContextState } from "./element/state";
+import { Group } from "./element/types";
 
 interface GroupComponentProps {
   group: Group;
 }
 
 const GroupComponent: React.FC<GroupComponentProps> = ({ group }) => {
-  const state = useKonvaContextState();
+  const state = useElementContextState();
   return (
     <div className="group">
       <h3>{group.name}</h3>
