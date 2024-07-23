@@ -2,14 +2,11 @@
 
 import { useElementOperations } from "@/components/react-konva/element/hooks";
 import { Viewport } from "@/components/react-konva/KonvaStructure";
-import {
-  Artboard,
-  Shape,
-  Layer,
-} from "@/components/react-konva/element/types";
+import { Artboard, Shape, Layer } from "@/components/react-konva/element/types";
 import { generateID } from "@/utils/common/generateID";
 import { View } from "lucide-react";
 import React from "react";
+import useImage from "use-image";
 
 interface ViewportProps {
   width?: number;
@@ -28,6 +25,10 @@ export const Canvas: React.FC<ViewportProps> = ({
     addObject,
     addChildToLayer,
   } = useElementOperations();
+
+  const mockupImage = useImage(
+    "https://ik.imagekit.io/c2rr9aewn/Kaos/610TzFZVkGL._AC_UY1000_.jpg"
+  );
 
   React.useEffect(() => {
     if (onceRef.current > 0) return;
@@ -52,18 +53,6 @@ export const Canvas: React.FC<ViewportProps> = ({
 
     addChildToArtboard(newArtboard.id, newLayer.id);
 
-    const newObject: Shape<"rect"> = {
-      id: `rect-${generateID()}`,
-      type: "rect",
-      config: {
-        x: 10,
-        y: 0,
-        width: 50,
-        height: 50,
-        fill: "red",
-      },
-      data: {},
-    };
     const newObject2: Shape<"circle"> = {
       id: `circle-${generateID()}`,
       type: "circle",
@@ -77,9 +66,6 @@ export const Canvas: React.FC<ViewportProps> = ({
       data: {},
     };
 
-    addObject(newObject);
-    addObject(newObject2);
-    addChildToLayer(newLayer.id, newObject.id);
     addChildToLayer(newLayer.id, newObject2.id);
 
     onceRef.current += 1;

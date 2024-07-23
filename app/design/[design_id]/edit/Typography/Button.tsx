@@ -35,7 +35,7 @@ const TypogaphyActionWrapper = () => {
         ...style,
         text,
         width: 300,
-        x: artboard.width() / 2,
+        x: artboard.width() / 2 - 300 / 2,
         y: artboard.height() / 2,
       },
       data: {},
