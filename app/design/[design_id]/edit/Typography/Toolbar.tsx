@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useKonvaContext } from "@/components/react-konva/hooks";
 import { ActionIcon, Group, Button, Box, ColorSwatch } from "@mantine/core";
 import {
   AlignCenterIcon,

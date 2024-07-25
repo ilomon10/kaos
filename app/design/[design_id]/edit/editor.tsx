@@ -5,7 +5,7 @@ import { Toolbar } from "./toolbar";
 import { Button, Flex } from "@mantine/core";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { Canvas } from "./Viewport";
+import { Viewport } from "./Viewport";
 import { useResizeObserver } from "@mantine/hooks";
 
 export const Editor = () => {
@@ -20,7 +20,7 @@ export const Editor = () => {
       }}
     >
       <Toolbar />
-      <Canvas height={height} width={width} />
+      <Viewport height={height} width={width} />
       <Flex
         className="fixed bottom-0 left-0 right-0 px-3 py-4"
         justify={"space-between"}

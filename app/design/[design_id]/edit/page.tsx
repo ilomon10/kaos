@@ -1,15 +1,13 @@
-import { Editor } from "./editor";
-import { ElementProvider } from "@/components/react-konva/element/state";
-import { SelectionProvider } from "@/components/react-konva/selection/state";
+import { Editor } from "@/components/react-konva/editor";
+import { Editor as Viewport } from "./editor";
+import { TextElement } from "@/components/Editor/nodes/Text";
 
 const DesignEditor = () => {
   return (
     <div className="fixed inset-0 overflow-hidden">
-      <ElementProvider>
-        <SelectionProvider>
-          <Editor />
-        </SelectionProvider>
-      </ElementProvider>
+      <Editor resolver={{ TextElement }}>
+        <Viewport />
+      </Editor>
     </div>
   );
 };
